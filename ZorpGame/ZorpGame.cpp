@@ -42,12 +42,17 @@ const int INDENT_X = 5;  // how many spaces to use to indent all text
 const int ROOM_DESC_Y = 8;  // the line to use for our room descriptions
 const int MOVEMENT_DESC_Y = 9;
 const int MAP_Y = 13; // the first line where the map is drawn.
+
+const char* EXTRA_OUTPUT_POS = "\x1b[25;6H";
 const int PLAYER_INPUT_X = 30;  // the character column where the player will type their input.
-const int PLAYER_INPUT_Y = 11;  // the line where the player will type their input.
+const int PLAYER_INPUT_Y = 23;  // the line where the player will type their input.
 const int WEST = 4;
 const int EAST = 6;
 const int NORTH = 8;
 const int SOUTH = 2;
+
+const int LOOK = 9;
+const int FIGHT = 10;
 
 bool enableVirtualTerminal()
 { // Set output mode to handle virtual terminal sequences 
@@ -71,6 +76,7 @@ bool enableVirtualTerminal()
 	return true;
 }
 
+
 void initialize(int map[MAZE_HEIGHT][MAZE_WIDTH])
 {
 	srand(time(nullptr));
@@ -90,12 +96,14 @@ void initialize(int map[MAZE_HEIGHT][MAZE_WIDTH])
 	map[MAZE_HEIGHT - 1][MAZE_WIDTH - 1] = EXIT;
 }
 
+
 void drawWelcomeMessage()
 {
 	cout << TITLE << MAGENTA << "Welcome to ZORP!" << RESET_COLOR << endl;
 	cout << INDENT << "ZORP is a game of adventure, danger, and low cunning." << endl;
 	cout << INDENT << "It is definitely not related to any other text-based adventure game." << endl << endl;
 }
+
 
 // MAKE SURE TO DECLARE/DEFINE drawRoom() function before the drawMap()
 void drawRoom(int map[MAZE_HEIGHT][MAZE_WIDTH], int x, int y)
@@ -135,6 +143,7 @@ void drawRoom(int map[MAZE_HEIGHT][MAZE_WIDTH], int x, int y)
 	}
 }
 
+
 void drawMap(int map[MAZE_HEIGHT][MAZE_WIDTH])
 {
 	// reset draw colors 
@@ -149,6 +158,7 @@ void drawMap(int map[MAZE_HEIGHT][MAZE_WIDTH])
 		cout << endl;
 	}
 }
+
 
 void drawRoomDescription(int roomType)
 {
@@ -188,6 +198,7 @@ void drawRoomDescription(int roomType)
 	}
 }
 
+
 void drawPlayer(int x, int y)
 {
 	x = INDENT_X + (6 * x) + 3;
@@ -198,6 +209,7 @@ void drawPlayer(int x, int y)
 	cout << CSI << y << ";" << x << "H";
 	cout << MAGENTA << "\x81" << RESET_COLOR;
 }
+
 
 void drawValidDirections(int x, int y)
 {
@@ -211,6 +223,7 @@ void drawValidDirections(int x, int y)
 		((y > 0) ? "north, " : "") <<
 		((y < MAZE_HEIGHT - 1) ? "south, " : "") << endl;
 }
+
 
 int getMovementDirection()
 {
@@ -234,6 +247,64 @@ int getMovementDirection()
 	return direction;
 }
 
+
+int getCommand()
+{ // for now, we can't read commands longer than 50 characters 
+	char input[50] = "\0";
+
+	// jump to the correct location 
+	cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
+
+	// clear any existing text 
+	cout << CSI << "4M"; std::cout << INDENT << "Enter a command.";
+
+	// move cursor to position for player to enter input 
+	cout << CSI << PLAYER_INPUT_Y << ";" << PLAYER_INPUT_X << "H" << YELLOW;
+
+	// clear the input buffer, ready for player input 
+	cin.clear();
+	cin.ignore(cin.rdbuf()->in_avail());
+
+	cin >> input;
+	cout << RESET_COLOR;
+
+	bool bMove = false;
+	while (input)
+	{
+		if (strcmp(input, "move") == 0 || strcmp(input, "go") == 0)
+		{
+			bMove = true;
+		}
+		else if (bMove == true)
+		{
+			if (strcmp(input, "north") == 0 || strcmp(input, "up") == 0)
+				return NORTH;
+			if (strcmp(input, "south") == 0 || strcmp(input, "down") == 0)
+				return SOUTH;
+			if (strcmp(input, "east") == 0 || strcmp(input, "right") == 0)
+				return EAST;
+			if (strcmp(input, "west") == 0 || strcmp(input, "left") == 0)
+				return WEST;
+		}
+
+		if (strcmp(input, "look") == 0)
+		{
+			return LOOK;
+		}
+		if (strcmp(input, "fight") == 0)
+		{
+			return FIGHT;
+		}
+
+		char next = cin.peek();
+		if (next == '\n' || next == EOF)
+			break;
+		cin >> input;
+	}
+	return 0;
+}
+
+
 void main()
 {
 	// create a 2D array
@@ -243,7 +314,7 @@ void main()
 	int playerX = 0;
 	int playerY = 0;
 
-	if (enableVirtualTerminal() == false) 
+	if (enableVirtualTerminal() == false)
 	{
 		cout << "The virtual terminal processing mode could not be activated." << endl;
 		cout << "Press 'Enter' to exit." << endl;
@@ -273,14 +344,14 @@ void main()
 		// list the directions the player can take 
 		drawValidDirections(playerX, playerY);
 
-		int direction = getMovementDirection();
+		int command = getCommand();
 
 		// before updating the player position, redraw the old room 
 		// character over the old position
 		drawRoom(rooms, playerX, playerY);
 
 		// update the player's position using the input movement data 
-		switch (direction)
+		switch (command)
 		{
 		case EAST:
 			if (playerX < MAZE_WIDTH - 1) playerX++;
@@ -296,9 +367,24 @@ void main()
 
 		case SOUTH:
 			if (playerY < MAZE_HEIGHT - 1) playerY++;
+			break;
+
+		case FIGHT:
+			drawPlayer(playerX, playerY);
+			cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You could try to fight, but you don't have a weapon." << endl;
+			cout << INDENT << "Press 'Enter' to continue.";
+			cin.clear();
+			cin.ignore(cin.rdbuf()->in_avail());
+			cin.get();
 		default:
 			// the direction was not valid, 
-			// do nothing, go back to the top of the loop and ask again 
+			// do nothing, go back to the top of the loop and ask again
+			drawPlayer(playerX, playerY);
+			cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You try, but you just can't do it." << endl;
+			cout << INDENT << "Press 'Enter' to continute.";
+			cin.clear();
+			cin.ignore(cin.rdbuf()->in_avail());
+			cin.get();
 			break;
 		}
 		// end game loop
@@ -307,7 +393,7 @@ void main()
 	cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// jump to the correct location 
 	cout << endl << INDENT << "Press 'Enter' to exit the program.";
-	cin.clear(); 
+	cin.clear();
 	cin.ignore(cin.rdbuf()->in_avail());
 	cin.get();
 
