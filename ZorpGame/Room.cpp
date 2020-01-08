@@ -1,18 +1,21 @@
 #include "Room.h"
 #include "GameDefines.h"
+#include "Powerup.h"
+#include "Player.h"
+#include "Food.h"
 #include <iostream>
 
 using namespace std;
 
 // m_type(EMPTY)  -  Directly initalize member variable  [Using Symbol ()]
 // m_type{EMPTY}  -  Uniformly initalize member variable  [Using Symbol {}]
-Room::Room() : m_type(EMPTY), m_mapPosition{ 0, 0 }
-{ 
-
+Room::Room() : m_type{ EMPTY }, m_mapPosition{ 0, 0 }, m_powerup{ nullptr }, m_enemy{ nullptr }, m_food{ nullptr }
+{
 }
 
 Room::~Room()
 {
+
 }
 
 void Room::setPosition(Point2D position)
@@ -30,7 +33,6 @@ int Room::getType()
 	return m_type;
 }
 
-
 void Room::draw()
 {
 	// find the console output position 
@@ -44,18 +46,19 @@ void Room::draw()
 	switch (m_type)
 	{
 	case EMPTY:
-		cout << "[ " << GREEN << "\xb0" << RESET_COLOR << " ] ";
-		break;
-
-	case ENEMY:
-		cout << "[ " << RED << "\x94" << RESET_COLOR << " ] ";
-		break;
-
-	case TREASURE: cout << "[ " << YELLOW << "$" << RESET_COLOR << " ] ";
-		break;
-
-	case FOOD:
-		cout << "[ " << CYAN << "\xcf" << RESET_COLOR << " ] ";
+		if (m_enemy != nullptr) {
+			std::cout << "[ " << RED << "\x94" << RESET_COLOR << " ] ";
+			break;
+		}
+		if (m_powerup != nullptr) {
+			std::cout << "[ " << YELLOW << "$" << RESET_COLOR << " ] ";
+			break;
+		}
+		if (m_food != nullptr) {
+			std::cout << "[ " << WHITE << "\xcf" << RESET_COLOR << " ] ";
+			break;
+		}
+		std::cout << "[ " << GREEN << "\xb0" << RESET_COLOR << " ] ";
 		break;
 
 	case ENTRANCE:
@@ -81,19 +84,22 @@ void Room::drawDescription()
 	switch (m_type)
 	{
 	case EMPTY:
+		if (m_enemy != nullptr) 
+		{
+			cout << INDENT << RED << "BEWARE." << RESET_COLOR << " An enemy is approaching." << endl;
+			break;
+		}
+		if (m_powerup != nullptr) 
+		{
+			cout << INDENT << "There appears to be some treasure here. Perhaps you should investigate futher." << endl;
+			break;
+		}
+		if (m_food != nullptr)
+		{
+			cout << INDENT << "You smell a recently extinguished campfire, perhaps left by a previous traveller." << endl;
+			break;
+		}
 		cout << INDENT << "You are in an empty meadow. There is nothing of note here." << endl;
-		break;
-
-	case ENEMY:
-		cout << INDENT << RED << "BEWARE." << RESET_COLOR << " An enemy is approaching." << endl;
-		break;
-
-	case TREASURE:
-		cout << INDENT << "Your journey has been rewarded. You have found some treasure." << endl;
-		break;
-
-	case FOOD:
-		cout << INDENT << "At last! You collect some food to sustain you on your journey." << endl;
 		break;
 
 	case ENTRANCE:
@@ -104,36 +110,4 @@ void Room::drawDescription()
 		cout << INDENT << "Despite all odds, you made it to the exit. Congratulations." << endl;
 		break;
 	}
-}
-
-bool Room::executeCommand(int command)
-{
-	switch (command)
-	{
-	case LOOK:
-		cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You look around, but see nothing worth mentioning" << endl;
-		cout << INDENT << "Press 'Enter' to continue.";
-		cin.clear();
-		cin.ignore(cin.rdbuf()->in_avail());
-		cin.get();
-		break;
-
-	case FIGHT:
-		cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You could try to fight, but you don't have a weapon." << endl;
-		cout << INDENT << "Press 'Enter' to continue.";
-		cin.clear();
-		cin.ignore(cin.rdbuf()->in_avail());
-		cin.get();
-		break;
-	default:
-		// the direction was not valid, 
-		// do nothing, go back to the top of the loop and ask again
-		cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You try, but you just can't do it." << endl;
-		cout << INDENT << "Press 'Enter' to continute.";
-		cin.clear();
-		cin.ignore(cin.rdbuf()->in_avail());
-		cin.get();
-		break;
-	}
-	return false;
 }

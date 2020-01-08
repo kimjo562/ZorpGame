@@ -30,11 +30,11 @@ void main()
 		game.update();
 	} // end game loop
 
-	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";	// jump to the correct location
-	std::cout << std::endl << INDENT << "Press 'Enter' to exit the program.";
-	std::cin.clear();
-	std::cin.ignore(std::cin.rdbuf()->in_avail());
-	std::cin.get();
+	cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";	// jump to the correct location
+	cout << endl << INDENT << "Press 'Enter' to exit the program.";
+	cin.clear();
+	cin.ignore(cin.rdbuf()->in_avail());
+	cin.get();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
