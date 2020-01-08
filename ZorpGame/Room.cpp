@@ -47,26 +47,26 @@ void Room::draw()
 	{
 	case EMPTY:
 		if (m_enemy != nullptr) {
-			std::cout << "[ " << RED << "\x94" << RESET_COLOR << " ] ";
+			cout << "[ " << RED << "\x94" << RESET_COLOR << " ] ";
 			break;
 		}
 		if (m_powerup != nullptr) {
-			std::cout << "[ " << YELLOW << "$" << RESET_COLOR << " ] ";
+			cout << "[ " << YELLOW << "$" << RESET_COLOR << " ] ";
 			break;
 		}
 		if (m_food != nullptr) {
-			std::cout << "[ " << WHITE << "\xcf" << RESET_COLOR << " ] ";
+			cout << "[ " << BLUE << "\xcf" << RESET_COLOR << " ] ";
 			break;
 		}
-		std::cout << "[ " << GREEN << "\xb0" << RESET_COLOR << " ] ";
+		cout << "[ " << GREEN << "\xb0" << RESET_COLOR << " ] ";
 		break;
 
 	case ENTRANCE:
-		cout << "[ " << WHITE << "\x9d" << RESET_COLOR << " ] ";
+		cout << "[ " << CYAN << "\x9d" << RESET_COLOR << " ] ";
 		break;
 
 	case EXIT:
-		cout << "[ " << WHITE << "\xFE" << RESET_COLOR << " ] ";
+		cout << "[ " << CYAN << "\xFE" << RESET_COLOR << " ] ";
 		break;
 	}
 }

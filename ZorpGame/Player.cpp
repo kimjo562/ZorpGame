@@ -130,7 +130,7 @@ void Player::pickup(Room* pRoom)
 {
 	if (pRoom->getPowerup() != nullptr) 
 	{
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You pick up the " << pRoom->getPowerup()->getName() << std::endl;
+		cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You pick up the " << pRoom->getPowerup()->getName() << endl;
 		// add the powerup to the player's inventory
 		addPowerup(pRoom->getPowerup());
 		// remove the powerup from the room 
@@ -141,13 +141,13 @@ void Player::pickup(Room* pRoom)
 	{
 		// eat the food
 		m_healthPoints += pRoom->getFood()->getHP();
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You feel refreshed. Your health is now " << m_healthPoints << std::endl;
+		cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You feel refreshed. Your health is now " << m_healthPoints << endl;
 		// remove the food from the room
 		pRoom->setFood(nullptr);
 	}
 	else 
 	{
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is nothing here to pick up." << std::endl;
+		cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is nothing here to pick up." << endl;
 	}
 }
 
@@ -156,7 +156,7 @@ void Player::attack(Enemy* pEnemy)
 {
 	if (pEnemy == nullptr)
 	{
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is no one here you can fight with." << std::endl;
+		cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is no one here you can fight with." << endl;
 	}
 	else
 	{
@@ -164,16 +164,16 @@ void Player::attack(Enemy* pEnemy)
 
 		if (pEnemy->isAlive() == false)
 		{
-			std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight a grue and kill it." << std::endl;
+			cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight a grue and kill it." << endl;
 		}
 		else
 		{
 			int damage = pEnemy->getAT() - m_defendPoints;
 			m_healthPoints -= damage;
 
-			std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight a grue and take " << damage <<
-				" points damage. Your healh is now at " << m_healthPoints << std::endl;
-			std::cout << INDENT << "The grue has " << pEnemy->getHP() << " health remaining." << std::endl;
+			cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight a grue and take " << damage <<
+				" points damage. Your healh is now at " << m_healthPoints << endl;
+			cout << INDENT << "The grue has " << pEnemy->getHP() << " health remaining." << endl;
 		}
 	}
 }
