@@ -4,16 +4,14 @@
 
 using namespace std;
 
-Player::Player()
-{
-	m_mapPosition.x = 0;
-	m_mapPosition.y = 0;
-}
+Player::Player() : m_mapPosition { 0, 0 }
+{ 
 
-Player::Player(int x, int y)
+} 
+
+Player::Player(int x, int y) : m_mapPosition{ x, y } 
 {
-	m_mapPosition.x = x;
-	m_mapPosition.y = y;
+
 }
 
 

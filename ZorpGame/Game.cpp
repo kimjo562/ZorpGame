@@ -6,9 +6,9 @@
 
 using namespace std;
 
-Game::Game()
+Game::Game() : m_gameOver{ false }
 {
-	m_gameOver = false;
+
 }
 
 Game::~Game()

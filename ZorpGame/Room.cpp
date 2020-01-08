@@ -4,11 +4,11 @@
 
 using namespace std;
 
-Room::Room()
-{
-	m_type = EMPTY;
-	m_mapPosition.x = 0;
-	m_mapPosition.y = 0;
+// m_type(EMPTY)  -  Directly initalize member variable  [Using Symbol ()]
+// m_type{EMPTY}  -  Uniformly initalize member variable  [Using Symbol {}]
+Room::Room() : m_type(EMPTY), m_mapPosition{ 0, 0 }
+{ 
+
 }
 
 Room::~Room()
