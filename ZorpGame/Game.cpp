@@ -67,7 +67,7 @@ void Game::update()
 		if (m_enemies[i].isAlive() == false) 
 		{
 			Point2D pos = m_enemies[i].getPosition();
-			m_map[pos.y][pos.x].setEnemy(nullptr);
+			m_map[pos.y][pos.x].removeGameObject(&m_enemies[i]);
 		}
 	}
 }
@@ -150,7 +150,7 @@ void Game::initializeEnemies()
 		int y = 2 + (rand() % (MAZE_HEIGHT - 3));
 
 		m_enemies[i].setPosition(Point2D{ x, y });
-		m_map[y][x].setEnemy(&m_enemies[i]);
+		m_map[y][x].addGameObject(&m_enemies[i]);
 	}
 }
 
@@ -187,7 +187,7 @@ void Game::initializePowerups()
 
 		strncat_s(name, itemNames[(rand() % 15)], 30);
 		m_powerups[i].setName(name);
-		m_map[y][x].setPowerup(&m_powerups[i]);
+		m_map[y][x].addGameObject(&m_powerups[i]);
 	}
 }
 
@@ -201,7 +201,7 @@ void Game::initializeFood()
 	{
 		int x = rand() % (MAZE_WIDTH - 1);
 		int y = rand() % (MAZE_HEIGHT - 1);
-		m_map[y][x].setFood(&m_food[i]);
+		m_map[y][x].addGameObject(&m_food[i]);
 	}
 }
 

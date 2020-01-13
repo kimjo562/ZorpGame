@@ -45,3 +45,9 @@ static const char itemNames[15][30] =
 	"Impatience", "Indecision", "Inspiration", "Independence", "Incurability",
 	"Integration", "Invocation", "Inferno", "Indigestion", "Inoculation"
 };
+
+const int PRIORITY_DEFAULT = 5;
+const int PRIORITY_PLAYER = 0;
+const int PRIORITY_ENEMY = 1;
+const int PRIORITY_POWERUP = 2;
+const int PRIORITY_FOOD = 3;

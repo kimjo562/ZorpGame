@@ -1,21 +1,21 @@
 #include "Room.h"
 #include "GameDefines.h"
+#include "GameObject.h"
+#include "Enemy.h"
 #include "Powerup.h"
-#include "Player.h"
 #include "Food.h"
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-// m_type(EMPTY)  -  Directly initalize member variable  [Using Symbol ()]
-// m_type{EMPTY}  -  Uniformly initalize member variable  [Using Symbol {}]
-Room::Room() : m_type{ EMPTY }, m_mapPosition{ 0, 0 }, m_powerup{ nullptr }, m_enemy{ nullptr }, m_food{ nullptr }
+
+Room::Room() : m_type{ EMPTY }, m_mapPosition{ 0, 0 }
 {
 }
 
 Room::~Room()
 {
-
 }
 
 void Room::setPosition(Point2D position)
@@ -33,38 +33,43 @@ int Room::getType()
 	return m_type;
 }
 
+void Room::addGameObject(GameObject* object)
+{
+	m_objects.push_back(object);
+	std::sort(m_objects.begin(), m_objects.end(), GameObject::compare);
+}
+
+void Room::removeGameObject(GameObject* object)
+{
+	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
+	{
+		if (*it == object) {
+			m_objects.erase(it);
+			return;
+		}
+	}
+}
+
 void Room::draw()
 {
-	// find the console output position 
+	// find the console output position
 	int outX = INDENT_X + (6 * m_mapPosition.x) + 1;
 	int outY = MAP_Y + m_mapPosition.y;
 
 	// jump to the correct location
 	cout << CSI << outY << ";" << outX << "H";
-
-	// draw the room 
-	switch (m_type)
-	{
+	// draw the room
+	switch (m_type) {
 	case EMPTY:
-		if (m_enemy != nullptr) {
-			cout << "[ " << RED << "\x94" << RESET_COLOR << " ] ";
-			break;
-		}
-		if (m_powerup != nullptr) {
-			cout << "[ " << YELLOW << "$" << RESET_COLOR << " ] ";
-			break;
-		}
-		if (m_food != nullptr) {
-			cout << "[ " << BLUE << "\xcf" << RESET_COLOR << " ] ";
-			break;
-		}
-		cout << "[ " << GREEN << "\xb0" << RESET_COLOR << " ] ";
+		// assume the first object in the vector take priority 
+		if (m_objects.size() > 0)
+			m_objects[0]->draw();
+		else
+			cout << "[ " << GREEN << "\xb0" << RESET_COLOR << " ] ";
 		break;
-
 	case ENTRANCE:
 		cout << "[ " << CYAN << "\x9d" << RESET_COLOR << " ] ";
 		break;
-
 	case EXIT:
 		cout << "[ " << CYAN << "\xFE" << RESET_COLOR << " ] ";
 		break;
@@ -75,39 +80,68 @@ void Room::drawDescription()
 {
 	// reset draw colors
 	cout << RESET_COLOR;
-	// jump to the correct location 
+	// jump to the correct location
 	cout << CSI << ROOM_DESC_Y << ";" << 0 << "H";
-	// Delete 4 lines and insert 4 empty lines 
+	// Delete 4 lines and insert 4 empty lines
 	cout << CSI << "4M" << CSI << "4L" << endl;
 
-	// write description of current room 
-	switch (m_type)
-	{
+	// write description of current room
+	switch (m_type) {
 	case EMPTY:
-		if (m_enemy != nullptr) 
-		{
-			cout << INDENT << RED << "BEWARE." << RESET_COLOR << " An enemy is approaching." << endl;
-			break;
-		}
-		if (m_powerup != nullptr) 
-		{
-			cout << INDENT << "There appears to be some treasure here. Perhaps you should investigate futher." << endl;
-			break;
-		}
-		if (m_food != nullptr)
-		{
-			cout << INDENT << "You smell a recently extinguished campfire, perhaps left by a previous traveller." << endl;
-			break;
-		}
-		cout << INDENT << "You are in an empty meadow. There is nothing of note here." << endl;
+		if (m_objects.size() > 0)
+			m_objects[0]->drawDescription();
+		else
+			cout << INDENT << "You are in an empty meadow. There is nothing of note here." << endl;
 		break;
-
 	case ENTRANCE:
 		cout << INDENT << "The entrance you used to enter this maze is blocked. There is no going back." << endl;
 		break;
-
 	case EXIT:
 		cout << INDENT << "Despite all odds, you made it to the exit. Congratulations." << endl;
 		break;
 	}
+}
+
+void Room::lookAt()
+{
+	if (m_objects.size() > 0)
+		m_objects[0]->lookAt();
+	else
+		cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You look around, but see nothing worth mentioning" << endl;
+}
+
+Enemy* Room::getEnemy()
+{
+	// Foreach = [For] GameObject [:] = in m_objects
+	for (GameObject* pObj : m_objects)
+	{
+		Enemy* enemy = dynamic_cast<Enemy*>(pObj);
+		if (enemy != nullptr)
+			return enemy;
+	}
+	return nullptr;
+}
+
+Powerup* Room::getPowerup()
+{
+	// Foreach = [For] GameObject [:] = in m_objects
+	for (GameObject* pObj : m_objects)
+	{
+		Powerup* powerup = dynamic_cast<Powerup*>(pObj);
+		if (powerup != nullptr)
+			return powerup;
+	}
+	return nullptr;
+}
+
+Food* Room::getFood()
+{
+	// Foreach = [For] GameObject [:] = in m_objects
+	for (GameObject* pObj : m_objects)
+	{
+		Food* food = dynamic_cast<Food*>(pObj);
+		if (food != nullptr)
+			return food;
+	}
+	return nullptr;
 }
