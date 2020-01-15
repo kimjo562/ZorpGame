@@ -1,0 +1,15 @@
+3
+2,-1,-1,Potion of Improbability,1.1,1,1
+2,2,1,Sword of Inspiration,1,1.1,1
+2,2,4,Shield of Inoculation,1,1,1.1
+4
+1,4,3,20,10,5,0
+1,7,2,20,10,5,0
+1,5,4,20,10,5,0
+1,4,2,20,10,5,0
+3
+3,7,2,10
+3,8,0,10
+3,4,4,10
+0,2,1,100,20,20,1
+Potion of Improbability

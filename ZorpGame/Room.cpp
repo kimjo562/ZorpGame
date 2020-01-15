@@ -43,11 +43,18 @@ void Room::removeGameObject(GameObject* object)
 {
 	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 	{
-		if (*it == object) {
+		if (*it == object) 
+		{	// reset the object's room number
+			(*it)->setPosition(Point2D{ -1,-1 });
 			m_objects.erase(it);
 			return;
 		}
 	}
+}
+
+void Room::clearGameObjects()
+{
+	m_objects.clear();
 }
 
 void Room::draw()

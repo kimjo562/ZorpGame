@@ -24,6 +24,9 @@ public:
 	void drawDescription();
 	void lookAt();
 
+	virtual void save(std::ofstream& out);
+	virtual bool load(std::ifstream& in, const Game* game);
+
 private:
 	char m_name[30];
 

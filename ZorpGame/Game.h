@@ -5,7 +5,6 @@
 #include "Player.h"
 
 class Enemy;
-class Food;
 class Powerup;
 
 class Game
@@ -23,6 +22,8 @@ public:
 
 	bool isGameOver();
 
+	Powerup* findPowerup(const char* name, bool isLoading = false) const;
+
 private:
 	bool enableVirtualTerminal();
 	void initializeMap();
@@ -35,6 +36,9 @@ private:
 	void drawValidDirections();
 
 	int getCommand();
+
+	void save();
+	bool load();
 
 private:
 	bool m_gameOver;
@@ -49,6 +53,9 @@ private:
 
 	int m_powerupCount;
 	Powerup* m_powerups;
+
+	int m_tempPowerupCount;
+	Powerup* m_tempPowerups;	// a place to store temporary powerups during loading
 
 	Player m_player;
 };

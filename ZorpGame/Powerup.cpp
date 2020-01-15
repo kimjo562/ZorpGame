@@ -1,7 +1,9 @@
 #include "Powerup.h"
 #include "GameDefines.h"
+#include "Game.h"
 #include <cstring>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -50,4 +52,69 @@ void Powerup::drawDescription()
 void Powerup::lookAt()
 {
 	cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is some treasure here. It looks small enough to pick up." << endl;
+}
+
+void Powerup::save(std::ofstream& out)
+{
+	if (!out.is_open())
+		return;
+
+	out << m_priority << ",";
+	out << m_mapPosition.x << ",";
+	out << m_mapPosition.y << ",";
+	out << m_name << ",";
+	out << m_healthMultiplier << ",";
+	out << m_attackMultiplier << ",";
+	out << m_defenceMultiplier << std::endl;
+}
+
+bool Powerup::load(std::ifstream& in, const Game* game)
+{
+	if (!in.is_open())
+		return false;
+
+	char buffer[50] = { 0 };
+
+	in.get(buffer, 50, ',');
+	if (in.rdstate() || buffer[0] == 0)
+		return false;
+	m_priority = std::stoi(buffer);
+
+	in.ignore(1);
+	in.get(buffer, 50, ',');
+	if (in.rdstate() || buffer[0] == 0)
+		return false;
+	m_mapPosition.x = std::stoi(buffer);
+
+	in.ignore(1);
+	in.get(buffer, 50, ',');
+	if (in.rdstate() || buffer[0] == 0)
+		return false;
+	m_mapPosition.y = std::stoi(buffer);
+
+	in.ignore(1);
+	in.get(buffer, 50, ',');
+	if (in.rdstate() || buffer[0] == 0)
+		return false;
+	strcpy_s(m_name, buffer);
+
+	in.ignore(1);
+	in.get(buffer, 50, ',');
+	if (in.rdstate() || buffer[0] == 0)
+		return false;
+	m_healthMultiplier = std::stof(buffer);		// these values are floats, so use stof()
+
+	in.ignore(1);
+	in.get(buffer, 50, ',');
+	if (in.rdstate() || buffer[0] == 0)
+		return false;
+	m_attackMultiplier = std::stof(buffer);
+
+	in.ignore(1);
+	in.getline(buffer, 50);
+	if (in.rdstate() || buffer[0] == 0)
+		return false;
+	m_defenceMultiplier = std::stof(buffer);
+
+	return true;
 }

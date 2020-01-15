@@ -19,3 +19,5 @@ bool GameObject::compare(const GameObject* p1, const GameObject* p2)
 {
 	return p1->m_priority < p2->m_priority;
 }
+
+

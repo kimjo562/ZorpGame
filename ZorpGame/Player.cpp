@@ -36,6 +36,8 @@ void Player::draw()
 	cout << MAGENTA << "\x81" << RESET_COLOR;
 
 	cout << INVENTORY_OUTPUT_POS;
+	// clear any existing text
+	cout << CSI << "1M";
 	for (auto it = m_powerups.begin(); it < m_powerups.end(); it++) 
 	{
 		cout << (*it)->getName() << "\t";
@@ -80,6 +82,9 @@ void Player::executeCommand(int command, Room* pRoom)
 		break;
 	case PICKUP:
 		pickup(pRoom);
+		break;
+	case SAVE:
+	case LOAD:
 		break;
 	default:
 		// the direction was not valid,
@@ -128,7 +133,7 @@ void Player::attack(Enemy* pEnemy)
 		pEnemy->onAttacked(m_attackPoints);
 
 		if (pEnemy->isAlive() == false) {
-			cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight a grue and kill it." << endl;
+			cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight a slime and kill it." << endl;
 		}
 		else {
 			int damage = pEnemy->getAT() - m_defendPoints;
@@ -137,9 +142,8 @@ void Player::attack(Enemy* pEnemy)
 
 			m_healthPoints -= damage;
 
-			cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight a grue and take " << damage <<
-				" points damage. Your healh is now at " << m_healthPoints << endl;
-			cout << INDENT << "The grue has " << pEnemy->getHP() << " health remaining." << endl;
+			cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight a slime and take " << damage << " points damage. Your healh is now at " << m_healthPoints << endl;
+			cout << INDENT << "The slime has " << pEnemy->getHP() << " health remaining." << endl;
 		}
 	}
 }

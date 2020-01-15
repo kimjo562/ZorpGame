@@ -23,6 +23,8 @@ public:
 
 	bool isAlive() { return (m_healthPoints > 0); }
 
+	virtual void save(std::ofstream& out);
+	virtual bool load(std::ifstream& in, const Game* game);
 
 protected:
 	std::vector<Powerup*> m_powerups;
