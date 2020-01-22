@@ -343,35 +343,33 @@ void Game::save()
 
 	// open the file for output, and truncate (any contents that 
 	// existed in the file before it is open are discarded)
-	out.open("zorp_savegame.txt", std::ofstream::out | std::ofstream::trunc);
+	out.open("zorp_savegame.dat", std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
 
 	if (out.is_open())
 	{
 		// save the position of every game object, and the player's stats
-
 		if (m_gameOver == true)
 		{
-			cout << EXTRA_OUTPUT_POS << "You have perished. Saving will not save you." << endl;
-			cout << INDENT << "Your progress has not been saved." << RESET_COLOR << endl;
+			std::cout << EXTRA_OUTPUT_POS << "You have perished. Saving will not save you." << std::endl;
+			std::cout << INDENT << "Your progress has not been saved." << RESET_COLOR << std::endl;
 		}
 		else
 		{
 			// output the powerups first, as these will need to be loaded before we load any characters
 			// (so we can correctly copy the powerup pointers to the characters' powerup list)
-
-			out << m_powerupCount << endl;
+			out.write((char*)&m_powerupCount, sizeof(int));
 			for (int i = 0; i < m_powerupCount; i++)
 			{
 				m_powerups[i].save(out);
 			}
 
-			out << m_enemyCount << endl;
+			out.write((char*)&m_enemyCount, sizeof(int));
 			for (int i = 0; i < m_enemyCount; i++)
 			{
 				m_enemies[i].save(out);
 			}
 
-			out << m_foodCount << endl;
+			out.write((char*)&m_foodCount, sizeof(int));
 			for (int i = 0; i < m_foodCount; i++)
 			{
 				m_food[i].save(out);
@@ -383,8 +381,8 @@ void Game::save()
 	else
 	{
 		// could not open the file, display an error message
-		std::cout << EXTRA_OUTPUT_POS << RED << "A slime has corrupted the scroll of rememberance." << endl;
-		std::cout << INDENT << "Your progress has not been saved." << RESET_COLOR << endl;
+		std::cout << EXTRA_OUTPUT_POS << RED << "A grue has corrupted the scroll of rememberance." << std::endl;
+		std::cout << INDENT << "Your progress has not been saved." << RESET_COLOR << std::endl;
 	}
 
 	out.flush();
@@ -395,41 +393,38 @@ bool Game::load()
 {
 	std::ifstream in;
 
-	in.open("zorp_savegame.txt", std::ofstream::in);
+	in.open("zorp_savegame.dat", std::ifstream::in | std::ifstream::binary);
 
 	if (!in.is_open())
 	{
 		return false;
 	}
 
-	char buffer[50] = { 0 };
-
-	// load all the powerups
-
+	// load all the powerups	
 	if (m_tempPowerups != nullptr)
 		delete[] m_tempPowerups;
 
-	in.getline(buffer, 50);
-	m_tempPowerupCount = std::stoi(buffer);
-	if (in.rdstate() || m_tempPowerupCount < 0)
-		return false;
-	m_tempPowerups = new Powerup[m_tempPowerupCount];
-	for (int i = 0; i < m_tempPowerupCount; i++)
-	{
-		if (m_tempPowerups[i].load(in, this) == false)
+	in.read((char*)&m_tempPowerupCount, sizeof(int));
+	if (in.rdstate() || m_tempPowerupCount < 0) return false;
+
+	if (m_tempPowerupCount > 0) {
+		m_tempPowerups = new Powerup[m_tempPowerupCount];
+		for (int i = 0; i < m_tempPowerupCount; i++)
 		{
-			delete[] m_tempPowerups;
-			m_tempPowerups = nullptr;
-			return false;
+			if (m_tempPowerups[i].load(in, this) == false)
+			{
+				delete[] m_tempPowerups;
+				m_tempPowerups = nullptr;
+				return false;
+			}
 		}
 	}
 
 	// load all the enemies
+	int enemyCount;
+	in.read((char*)&enemyCount, sizeof(int));
+	if (in.rdstate() || enemyCount < 0) return false;
 
-	in.getline(buffer, 50);
-	int enemyCount = std::stoi(buffer);
-	if (in.rdstate() || enemyCount < 0)
-		return false;
 	Enemy* enemies = new Enemy[enemyCount];
 	for (int i = 0; i < enemyCount; i++)
 	{
@@ -443,11 +438,10 @@ bool Game::load()
 	}
 
 	// load all the food
+	int foodCount;
+	in.read((char*)&foodCount, sizeof(int));
+	if (in.rdstate() || foodCount < 0) return false;
 
-	in.getline(buffer, 50);
-	int foodCount = std::stoi(buffer);
-	if (in.rdstate() || foodCount < 0)
-		return false;
 	Food* foods = new Food[foodCount];
 	for (int i = 0; i < foodCount; i++)
 	{
@@ -520,7 +514,6 @@ bool Game::load()
 
 	// add the player
 	m_player = player;
-
 	return true;
 }
 
